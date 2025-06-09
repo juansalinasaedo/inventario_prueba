@@ -17,7 +17,7 @@ $productos = $productoController->obtenerProductos();
     <title>Consulta de Bodega</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJv3fUs0hL2jG9NN15hHmwqzF5fZ2XlDk2jt4jj2vYJ9BhHboHXyl56yN7kS" crossorigin="anonymous">
+    <link href="css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJv3fUs0hL2jG9NN15hHmwqzF5fZ2XlDk2jt4jj2vYJ9BhHboHXyl56yN7kS" crossorigin="anonymous">
 </head>
 <body>
     <header>
@@ -27,28 +27,28 @@ $productos = $productoController->obtenerProductos();
     <section>
         <!-- Verificar si hay productos disponibles -->
         <?php if (!empty($productos)): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Número de Inventario</th>
-                        <th>Número de Serie</th>
-                        <th>Estado</th>
-                        <th>Ubicación Actual</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($productos as $producto): ?>
-                    <tr>
-                        <td><?= $producto['nombre'] ?></td>
-                        <td><?= $producto['numero_inventario'] ?></td>
-                        <td><?= $producto['numero_serie'] ?></td>
-                        <td><?= $producto['estado'] ?></td>
-                        <td><?= $producto['ubicacion_actual'] ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Número de Inventario</th>
+                    <th>Número de Serie</th>
+                    <th>Estado</th>
+                    <th>Ubicación Actual</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($productos as $producto): ?>
+                <tr>
+                    <td><?= $producto['nombre'] ?></td>
+                    <td><?= $producto['numero_inventario'] ?></td>
+                    <td><?= $producto['numero_serie'] ?></td>
+                    <td><?= $producto['estado'] ?></td>
+                    <td><?= $producto['ubicacion_actual'] ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
             <br><br>
             <a href="index.php">Volver</a>  
         <?php else: ?>

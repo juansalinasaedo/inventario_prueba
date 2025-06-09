@@ -146,4 +146,11 @@ a:hover {
         font-size: 1em;
         padding: 8px 15px;
     }
+
+    /* Estilo personalizado para el encabezado */
+    header h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #0047b3;
+    }
 }
