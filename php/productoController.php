@@ -1,38 +1,53 @@
 <?php
-// Incluir el archivo de conexión a la base de datos
 include_once('db.php');
+
 class ProductoController {
-    public function obtenerProductos($orderBy = 'nombre', $orderDirection = 'ASC', $bodegaFilter = '') {
-        // Conexión a la base de datos
-        include_once 'db.php';
+
+    public function obtenerProductos($orderBy = 'nombre', $orderDirection = 'ASC', $bodegaFilter = '', $limit = 10, $offset = 0) {
         $database = new Database();
         $pdo = $database->getConnection();
 
-        // Consulta SQL dinámica con ordenación
+        $columnasPermitidas = ['nombre', 'numero_inventario', 'numero_serie', 'estado', 'ubicacion_actual', 'fecha_adquisicion'];
+        $direccionesPermitidas = ['ASC', 'DESC'];
+
+        if (!in_array($orderBy, $columnasPermitidas)) {
+            $orderBy = 'nombre';
+        }
+
+        if (!in_array(strtoupper($orderDirection), $direccionesPermitidas)) {
+            $orderDirection = 'ASC';
+        }
+
         $query = "SELECT * FROM productos WHERE 1";
 
-        // Si hay un filtro por bodega
-        if ($bodegaFilter) {
+        if (!empty($bodegaFilter)) {
             $query .= " AND ubicacion_actual LIKE :bodegaFilter";
         }
 
-        // Añadir la parte de ordenación
-        $query .= " ORDER BY $orderBy $orderDirection";
+        $query .= " ORDER BY $orderBy $orderDirection LIMIT :limit OFFSET :offset";
 
-        // Preparar la consulta
         $stmt = $pdo->prepare($query);
 
-        // Vincular los parámetros
-        if ($bodegaFilter) {
+        if (!empty($bodegaFilter)) {
             $stmt->bindValue(':bodegaFilter', "%$bodegaFilter%");
         }
 
-        // Ejecutar la consulta
+        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerBodegas() {
+        $database = new Database();
+        $pdo = $database->getConnection();
+
+        $query = "SELECT DISTINCT ubicacion_actual AS nombre FROM productos";
+        $stmt = $pdo->prepare($query);
         $stmt->execute();
 
-        // Devolver los resultados
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-
 ?>
