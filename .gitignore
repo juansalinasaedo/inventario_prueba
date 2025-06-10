@@ -1,0 +1,5 @@
+.env
+vendor/
+*.log
+*.zip
+__pycache__/
