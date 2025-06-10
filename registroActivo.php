@@ -1,18 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Activo</title>
-    <!-- Incluir Bootstrap CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJv3fUs0hL2jG9NN15hHmwqzF5fZ2XlDk2jt4jj2vYJ9BhHboHXyl56yN7kS" crossorigin="anonymous">
-</head>
-<body>
-    <div class="container my-5">
-        <header class="text-center mb-4">
-            <h1>Registrar Nuevo Activo</h1>
-        </header>
+    <!-- Enlace a Bootstrap local -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Enlace a Font Awesome para los iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Efecto al pasar el cursor sobre los botones */
+        .btn:hover {
+            transform: scale(1.1);
+            transition: transform 0.3s ease;
+        }
 
+        /* Animación en el botón para volver al home */
+        .btn-home {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-home::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background-color: rgba(0, 123, 255, 0.2); /* Color de fondo cuando se activa */
+            transition: all 0.5s ease-in-out;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+        }
+
+        .btn-home:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Cabecera -->
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Registrar Nuevo Activo</h1>
+        <p class="lead">Ingresa la información del activo que deseas registrar.</p>
+    </header>
+
+    <!-- Cuerpo -->
+    <div class="container my-5">
         <form method="POST" action="registroActivo.php">
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre del Activo:</label>
@@ -49,13 +87,27 @@
             </div>
 
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">Registrar</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Registrar
+                </button>
             </div>
         </form>
+
+        <!-- Botón para volver al home -->
+        <div class="text-center mt-4">
+            <a href="index.php" class="btn btn-home btn-outline-primary">
+                <i class="fas fa-home"></i> Volver al Home
+            </a>
+        </div>
     </div>
 
-    <!-- Incluir Bootstrap JS y Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- Pie de página (Footer) -->
+    <footer class="bg-dark text-white text-center py-3">
+        <p>&copy; 2025 Fiscalía Regional del Maule | Todos los derechos reservados</p>
+    </footer>
+
+    <!-- Incluir el script de Bootstrap local -->
+    <script src="js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
