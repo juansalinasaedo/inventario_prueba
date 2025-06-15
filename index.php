@@ -1,6 +1,6 @@
 <?php
 session_start(); // Iniciar sesión para almacenar los resultados
-
+$searchTerm = ''; // Inicializar por defecto
 // Incluir el archivo de conexión a la base de datos
 include_once 'php/db.php';
 require 'vendor/autoload.php'; // Incluir PhpSpreadsheet
@@ -12,27 +12,31 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 $database = new Database();
 $pdo = $database->getConnection();
 
-// Procesar la búsqueda
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['search'])) {
-    $searchTerm = $_POST['search'];
-    
-    // Consulta a la base de datos utilizando PDO
-    $query = "SELECT * FROM productos WHERE nombre LIKE :searchTerm OR numero_inventario LIKE :searchTerm";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute(['searchTerm' => "%$searchTerm%"]);
-    
-    // Obtener los resultados
-    $searchResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Almacenar los resultados de la búsqueda en la sesión
-    $_SESSION['searchResults'] = $searchResults;
+// Si se accede sin buscar ni exportar, limpiar búsqueda anterior
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    unset($_SESSION['searchResults']);
+    $searchResults = [];
 } else {
-    // Si no hay búsqueda, recuperar los resultados almacenados en la sesión
-    $searchResults = isset($_SESSION['searchResults']) ? $_SESSION['searchResults'] : [];
+    // Procesar la búsqueda
+    if (isset($_POST['search'])) {
+        $searchTerm = $_POST['search'];
+        
+        $query = "SELECT * FROM productos WHERE nombre LIKE :searchTerm OR numero_inventario LIKE :searchTerm";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute(['searchTerm' => "%$searchTerm%"]);
+        
+        $searchResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $_SESSION['searchResults'] = $searchResults;
+    } else {
+        $searchResults = isset($_SESSION['searchResults']) ? $_SESSION['searchResults'] : [];
+    }
 }
 
 // Exportar los resultados a Excel
 if (isset($_POST['export_excel']) && !empty($searchResults)) {
+    // Limpiar resultados de la sesión después de exportar
+    unset($_SESSION['searchResults']);
+
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
 
@@ -66,8 +70,12 @@ if (isset($_POST['export_excel']) && !empty($searchResults)) {
     $writer->save('php://output');
     exit;
 }
-?>
 
+// Si se accede sin buscar ni exportar, limpiar búsqueda anterior
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    unset($_SESSION['searchResults']);
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -120,12 +128,20 @@ if (isset($_POST['export_excel']) && !empty($searchResults)) {
         <!-- Formulario de búsqueda -->
         <div class="row mb-4">
             <div class="col-md-12 text-center">
-                <form method="POST" action="index.php">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema" required>
-                        <button class="btn btn-outline-secondary btn-search" type="submit"><i class="fas fa-search"></i> Buscar</button>
-                    </div>
-                </form>
+            <form method="POST" action="index.php">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Buscar en el sistema..." aria-label="Buscar en el sistema" value="<?= htmlspecialchars($searchTerm) ?>" required>
+                    <button class="btn btn-outline-secondary btn-search" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+
+                    <?php if (!empty($searchResults) || (!empty($searchTerm) && $_SERVER['REQUEST_METHOD'] == 'POST')): ?>
+                        <a href="index.php" class="btn btn-outline-danger ms-2">
+                            <i class="fas fa-times-circle"></i> Limpiar búsqueda
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </form>
             </div>
         </div>
 
@@ -171,10 +187,10 @@ if (isset($_POST['export_excel']) && !empty($searchResults)) {
                 </div>
             </div>
         </div>
-        <?php elseif ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
-        <div class="alert alert-warning">
-            No se encontraron resultados para la búsqueda.
-        </div>
+        <?php elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['search']) && trim($_POST['search']) !== ''): ?>
+            <div class="alert alert-warning">
+                No se encontraron resultados para la búsqueda.
+            </div>
         <?php endif; ?>
     </div>
 
@@ -205,6 +221,25 @@ if (isset($_POST['export_excel']) && !empty($searchResults)) {
                         <h5 class="card-title"><i class="fas fa-file-excel"></i> Generar Reporte</h5>
                         <p class="card-text">Genera un reporte de productos en formato Excel.</p>
                         <a href="entregaReporte.php" class="btn btn-info">Generar Reporte</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-exchange-alt"></i> Registrar Movimiento</h5>
+                        <p class="card-text">Registra entradas, salidas, ajustes o traslados de productos.</p>
+                        <a href="registroMovimiento.php" class="btn btn-warning">Registrar Movimiento</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="fas fa-history"></i> Ver Movimientos</h5>
+                        <p class="card-text">Consulta el historial de movimientos realizados.</p>
+                        <a href="consultaMovimientos.php" class="btn btn-secondary">Ver Movimientos</a>
                     </div>
                 </div>
             </div>

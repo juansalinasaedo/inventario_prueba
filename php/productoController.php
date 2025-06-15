@@ -3,6 +3,7 @@ include_once('db.php');
 
 class ProductoController {
 
+    // Obtener productos con opciones de ordenamiento, filtro por bodega y paginación
     public function obtenerProductos($orderBy = 'nombre', $orderDirection = 'ASC', $bodegaFilter = '', $limit = 10, $offset = 0) {
         $database = new Database();
         $pdo = $database->getConnection();
@@ -39,6 +40,7 @@ class ProductoController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Obtener todas las bodegas disponibles (ubicaciones únicas)
     public function obtenerBodegas() {
         $database = new Database();
         $pdo = $database->getConnection();
@@ -49,5 +51,16 @@ class ProductoController {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Obtener productos para formularios (solo id y nombre)
+    public function obtenerProductosParaFormulario() {
+        $database = new Database();
+        $pdo = $database->getConnection();
+
+        $query = "SELECT id, nombre FROM productos ORDER BY nombre ASC";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
-?>
