@@ -54,7 +54,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 //     Code works for PHP 5.x
 
 // Primary changes made by canyoncasa (dvc) for ParseXL 1.10 ...
-// http://sourceforge.net/tracker/index.php?func=detail&aid=1466964&group_id=99160&atid=623334
+// http://sourceforge.net/tracker/dashboard.php?func=detail&aid=1466964&group_id=99160&atid=623334
 //     Decoding of formula conditions, results, and tokens.
 //     Support for user-defined named cells added as an array "namedcells"
 //         Patch code for user-defined named cells supports single cells only.
@@ -3694,7 +3694,7 @@ class Xls extends XlsBase
             switch ($hyperlinkType) {
                 case 'URL':
                     // section 5.58.2: Hyperlink containing a URL
-                    // e.g. http://example.org/index.php
+                    // e.g. http://example.org/dashboard.php
 
                     // offset: var; size: 16; GUID of URL Moniker
                     $offset += 16;

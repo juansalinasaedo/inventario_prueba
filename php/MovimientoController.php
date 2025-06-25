@@ -4,20 +4,29 @@ include_once 'db.php';
 class MovimientoController {
     public function obtenerMovimientos() {
         $db = new Database();
-        $conn = $db->getConnection();
-
-        $stmt = $conn->prepare("
-            SELECT m.*, 
-                   p.nombre AS producto_nombre, 
-                   p.numero_inventario, 
-                   u.nombre AS responsable_nombre
+        $pdo = $db->getConnection();
+    
+        $query = "
+            SELECT 
+                m.id,
+                m.tipo,
+                m.cantidad,
+                m.estado_producto,
+                m.ubicacion_anterior,
+                m.ubicacion_nueva,
+                m.fecha,
+                m.responsable,
+                m.observaciones,
+                p.nombre AS producto_nombre,
+                p.numero_inventario
             FROM movimientos m
             JOIN productos p ON m.producto_id = p.id
-            JOIN usuarios u ON m.usuario_id = u.id
             ORDER BY m.fecha DESC
-        ");
-
+        ";
+    
+        $stmt = $pdo->prepare($query);
         $stmt->execute();
+    
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

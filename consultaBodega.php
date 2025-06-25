@@ -1,4 +1,5 @@
 <?php
+include_once 'auth.php';
 include('php/productoController.php');
 
 $productoController = new ProductoController();
@@ -25,7 +26,8 @@ $productos = $productoController->obtenerProductos($orderBy, $orderDirection, $b
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-<header class="bg-primary text-white text-center py-4">
+<header class="bg-primary text-white text-center py-4 position-relative">
+    <a href="logout.php" class="btn btn-outline-light position-absolute top-0 end-0 m-3">Cerrar Sesión</a>
     <h1>Consulta de Bodega</h1>
     <p class="lead">Visualiza todos los productos registrados en la bodega.</p>
 </header>
@@ -34,7 +36,7 @@ $productos = $productoController->obtenerProductos($orderBy, $orderDirection, $b
     <?php if (!empty($productos)): ?>
     <div class="row mb-4 text-center">
         <div class="col-md-12">
-            <form method="POST" action="index.php" style="display:inline-block;">
+            <form method="POST" action="dashboard.php" style="display:inline-block;">
                 <button class="btn btn-primary" type="submit">
                     <i class="fas fa-arrow-left"></i> Volver al Inicio
                 </button>

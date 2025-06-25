@@ -79,7 +79,7 @@ DB_PASS=
 2. Abre el navegador y visita:
 
 ```
-http://localhost/inventario_fiscalia/index.php
+http://localhost/inventario_fiscalia/dashboard.php
 ```
 
 ---
@@ -118,7 +118,7 @@ inventario_fiscalia/
 ├── exportarExcel.php
 ├── exportarPDF.php
 ├── registroActivo.php
-├── index.php
+├── dashboard.php
 ├── inventario_oficina.sql
 ├── .env.example
 └── README.md

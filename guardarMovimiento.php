@@ -1,59 +1,97 @@
 <?php
+session_start();
 include_once 'php/db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $producto_id = $_POST['producto_id'] ?? null;
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $producto_id = $_POST['producto_id'] ?? '';
     $tipo = $_POST['tipo'] ?? '';
-    $motivo = $_POST['motivo'] ?? '';
-    $usuario_id = $_POST['responsable_id'] ?? null;
-    $fecha = $_POST['fecha_movimiento'] ?? date('Y-m-d');
+    $motivo = trim($_POST['motivo'] ?? '');
+    $responsable = trim($_POST['responsable'] ?? '');
+    $fecha = $_POST['fecha_movimiento'] ?? '';
+    $ubicacion_anterior = $_POST['ubicacion_anterior'] ?? '';
+    $ubicacion_nueva = $_POST['ubicacion_nueva'] ?? null;
 
-    if (!$producto_id || !$tipo || !$usuario_id) {
-        die('Faltan campos obligatorios.');
+    $errores = [];
+
+    // Validaciones básicas
+    if (empty($producto_id)) $errores[] = "Debe seleccionar un producto.";
+    if (empty($tipo)) $errores[] = "Debe seleccionar un tipo de movimiento.";
+    if (empty($motivo)) $errores[] = "Debe ingresar un motivo u observación.";
+    if (empty($responsable)) $errores[] = "Debe ingresar el nombre del responsable.";
+    if (empty($fecha)) {
+        $errores[] = "Debe seleccionar una fecha.";
+    } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+        $errores[] = "La fecha no tiene un formato válido (YYYY-MM-DD).";
+    } elseif (strtotime($fecha) > strtotime(date('Y-m-d'))) {
+        $errores[] = "La fecha de movimiento no puede ser futura.";
+    }
+    if (($tipo === 'Traslado' || $tipo === 'Ajuste') && empty($ubicacion_nueva)) {
+        $errores[] = "Debe especificar la nueva ubicación para movimientos de tipo Traslado o Ajuste.";
     }
 
-    // Conectar a la base de datos
-    $db = new Database();
-    $conn = $db->getConnection();
+    $usuario_id = null;
 
-    // Obtener ubicación actual del producto
-    $stmtProd = $conn->prepare("SELECT ubicacion_actual FROM productos WHERE id = ?");
-    $stmtProd->execute([$producto_id]);
-    $producto = $stmtProd->fetch(PDO::FETCH_ASSOC);
-    $ubicacionAnterior = $producto ? $producto['ubicacion_actual'] : null;
-    $ubicacionNueva = $ubicacionAnterior; // Por defecto
+    $database = new Database();
+    $pdo = $database->getConnection();
 
-    // Si es traslado, se espera un campo ubicacion_nueva (opcional de momento)
-    if ($tipo === 'traslado' && isset($_POST['ubicacion_nueva'])) {
-        $ubicacionNueva = $_POST['ubicacion_nueva'];
+    // Obtener ubicación actual
+    $stmtProducto = $pdo->prepare("SELECT ubicacion_actual FROM productos WHERE id = :producto_id");
+    $stmtProducto->execute(['producto_id' => $producto_id]);
+    $producto = $stmtProducto->fetch(PDO::FETCH_ASSOC);
+    $ubicacion_actual = $producto ? $producto['ubicacion_actual'] : 'Desconocida';
+    $ubicacion_anterior = $ubicacion_actual;
+
+    // Validar si se permite el movimiento según ubicación actual
+    if (in_array($tipo, ['Salida', 'Traslado', 'Ajuste'])) {
+        if ($ubicacion_actual !== 'Bodega UGI' && $ubicacion_nueva !== 'Bodega UGI') {
+            $errores[] = "No se puede registrar un movimiento de tipo '$tipo' si el producto no está en 'Bodega UGI'.";
+            $errores[] = "Ubicación actual del producto: '$ubicacion_actual'.";
+        }
+    }
+
+    // Definir ubicación nueva según tipo si corresponde
+    if ($tipo === 'Entrada') {
+        $ubicacion_nueva = 'Bodega UGI';
+    } elseif ($tipo === 'Salida') {
+        $ubicacion_nueva = 'Prestado';
+    }
+
+    // Si hay errores, volver con mensaje
+    if (!empty($errores)) {
+        $_SESSION['errores_movimiento'] = $errores;
+        header("Location: registroMovimiento.php");
+        exit;
     }
 
     // Insertar movimiento
-    $stmt = $conn->prepare("INSERT INTO movimientos 
-        (producto_id, tipo, cantidad, estado_producto, ubicacion_anterior, ubicacion_nueva, fecha, usuario_id, observaciones) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
+    $stmt = $pdo->prepare("
+        INSERT INTO movimientos 
+        (producto_id, tipo, observaciones, responsable, fecha, ubicacion_anterior, ubicacion_nueva, usuario_id) 
+        VALUES 
+        (:producto_id, :tipo, :observaciones, :responsable, :fecha, :ubicacion_anterior, :ubicacion_nueva, :usuario_id)
+    ");
     $stmt->execute([
-        $producto_id,
-        strtolower($tipo),
-        1, // cantidad fija por ahora
-        'bueno', // estado predeterminado
-        $ubicacionAnterior,
-        $ubicacionNueva,
-        $fecha,
-        $usuario_id,
-        $motivo
+        'producto_id' => $producto_id,
+        'tipo' => $tipo,
+        'observaciones' => $motivo,
+        'responsable' => $responsable,
+        'fecha' => $fecha,
+        'ubicacion_anterior' => $ubicacion_anterior,
+        'ubicacion_nueva' => $ubicacion_nueva,
+        'usuario_id' => $usuario_id
     ]);
 
-    // Si hubo traslado, actualizar ubicación del producto
-    if ($tipo === 'traslado' && $ubicacionNueva && $ubicacionNueva !== $ubicacionAnterior) {
-        $update = $conn->prepare("UPDATE productos SET ubicacion_actual = ? WHERE id = ?");
-        $update->execute([$ubicacionNueva, $producto_id]);
-    }
+    // Actualizar producto
+    $stmtUpdate = $pdo->prepare("UPDATE productos SET ubicacion_actual = :nueva WHERE id = :producto_id");
+    $stmtUpdate->execute([
+        'nueva' => $ubicacion_nueva,
+        'producto_id' => $producto_id
+    ]);
 
-    header('Location: consultaMovimientos.php');
+    $_SESSION['mensaje_exito'] = "Movimiento registrado correctamente.";
+    header("Location: consultaMovimientos.php");
     exit;
 } else {
-    echo "Acceso no permitido.";
+    header("Location: registroMovimiento.php");
+    exit;
 }
-?>
