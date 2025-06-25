@@ -1,138 +1,96 @@
 # 🗂️ Sistema de Inventario - Fiscalía Regional del Maule
 
-Sistema web para gestionar el inventario de productos informáticos de la Fiscalía Regional del Maule. Permite registrar, consultar, filtrar, ordenar y exportar información de la bodega de activos.
+Este sistema permite gestionar el inventario de activos e insumos del área informática. Se puede registrar y consultar movimientos como entradas, salidas, traslados y ajustes, manteniendo un control de la ubicación y estado de los productos.
 
 ---
 
-## 🚀 Funcionalidades
+## 🚀 Funcionalidades principales
 
-- Registro y visualización de productos informáticos
-- Filtro por bodega
-- Ordenamiento ascendente/descendente por:
-  - Nombre
-  - Número de inventario
-  - Serie
-  - Estado
-  - Ubicación actual
-  - Fecha de adquisición
-- Exportación a:
-  - 📊 Excel
-  - 📄 PDF
-- Paginación de resultados
-- Interfaz responsive con Bootstrap 5
+- ✅ Autenticación con LDAP (Active Directory)
+- ✅ Registro de productos (activos e insumos)
+- ✅ Registro de movimientos (Entrada, Salida, Traslado, Ajuste)
+- ✅ Control de ubicación actual de productos
+- ✅ Bloqueo de movimientos si el producto no está en "Bodega UGI"
+- ✅ Paginación, ordenamiento y búsqueda de movimientos
+- ✅ Panel principal con acceso a todas las opciones (Dashboard)
+- ✅ Sistema de sesiones con botón de cierre de sesión
 
 ---
 
-## 🛠️ Requisitos
+## 🛠 Tecnologías utilizadas
 
-- PHP 8.x
+- PHP 8.2
 - MySQL / MariaDB
-- Composer
-- Servidor local (XAMPP, WAMP, Laragon, etc.)
+- Bootstrap 5
+- JavaScript
+- XAMPP para desarrollo local
 
 ---
 
-## 📦 Instalación
+## 📦 Requisitos
 
-### 1. Clona el repositorio
+- PHP >= 8.0
+- MySQL o MariaDB
+- Servidor Apache (recomendado: XAMPP o similar)
+- Acceso a un servidor LDAP (Active Directory)
 
-```bash
-git clone https://github.com/juansalinasaedo/inventario_prueba.git
-cd inventario_prueba
-```
+---
 
-### 2. Instala dependencias
+## ⚙️ Configuración del proyecto
 
-```bash
-composer install
-```
+1. **Clonar el repositorio:**
 
-### 3. Importa la base de datos
+   ```bash
+   git clone https://github.com/juansalinasaedo/inventario_prueba.git
 
-Usa phpMyAdmin o la terminal para importar el archivo:
-
-`inventario_oficina.sql`
-
-### 4. Configura el entorno
-
-Copia el archivo de ejemplo `.env.example` y crea tu archivo `.env` con tus credenciales:
-
-```bash
+2. **Copiar y configurar el archivo de entorno:**
 cp .env.example .env
-```
 
-Edita `.env` con tu configuración local:
-
-```env
+3. **Editar el archivo .env con tus datos de conexión:**
 DB_HOST=localhost
-DB_NAME=inventario_oficina
+DB_NAME=inventario
 DB_USER=root
 DB_PASS=
-```
 
----
+LDAP_SERVER=ldap://dominio.local
+LDAP_PORT=389
+LDAP_DOMAIN=DOMINIO
+LDAP_BASE_DN=DC=dominio,DC=local
 
-## ▶️ Uso del sistema
+4. **Importar la base de datos:**
+Importa el archivo inventario.sql (si existe) en tu gestor de base de datos (como phpMyAdmin).
 
-1. Inicia Apache y MySQL desde tu entorno local (XAMPP, etc.).
+5. **Iniciar servidor local:**
+Abre XAMPP
 
-2. Abre el navegador y visita:
+Inicia Apache y MySQL
 
-```
-http://localhost/inventario_fiscalia/dashboard.php
-```
+Accede al proyecto desde http://localhost/inventario_prueba/
 
----
+🧑‍💻 Estructura del proyecto
 
-## 📤 Exportaciones disponibles
-
-| Formato | Archivo              | Descripción                                  |
-|---------|----------------------|----------------------------------------------|
-| Excel   | `exportarExcel.php`  | Exporta los productos filtrados a tabla Excel |
-| PDF     | `exportarPDF.php`    | Genera un informe con logo, tabla y fecha     |
-
----
-
-## 🔐 Seguridad aplicada
-
-- Consultas preparadas con `PDO` (prevención de SQL Injection)
-- Credenciales gestionadas con archivo `.env`
-- Escapado de salida HTML para prevenir XSS
-- Validación de filtros y columnas de ordenamiento
-- `.gitignore` para evitar subir archivos sensibles
-
----
-
-## 📁 Estructura recomendada
-
-```
-inventario_fiscalia/
-├── php/
-│   ├── db.php
-│   └── productoController.php
+bash
+Copiar
+Editar
+inventario_prueba/
 ├── css/
 ├── js/
-├── img/
-├── vendor/
-├── consultaBodega.php
-├── exportarExcel.php
-├── exportarPDF.php
+├── php/
+│   ├── db.php
+│   ├── ProductoController.php
+│   ├── MovimientoController.php
+│   └── obtener_ubicacion.php
 ├── registroActivo.php
+├── registroMovimiento.php
+├── consultaMovimientos.php
 ├── dashboard.php
-├── inventario_oficina.sql
-├── .env.example
-└── README.md
-```
+├── validar_login.php
+├── logout.php
+└── .env
 
----
+✍️ Autor
+Juan Salinas Aedo
+Desarrollado para la Fiscalía Regional del Maule
 
-## 👤 Autor
-
-**Juan Salinas**  
-Ingeniero Informático – Fiscalía Regional del Maule
-
----
-
-## ✅ Licencia
-
-Este proyecto es de uso interno. No cuenta con licencia pública.
+📄 Licencia
+Uso interno. No distribuible públicamente sin autorización.
