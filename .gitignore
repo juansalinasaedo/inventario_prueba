@@ -1,5 +1,49 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de configuración de entorno
 .env
-vendor/
+*.env
+.env.*
+
+# Configuración de IDEs y editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Cache y logs
+cache/
 *.log
-*.zip
-__pycache__/
+logs/
+*.cache
+*.tmp
+tmp/
+
+# Archivos de respaldo o temporales
+*.bak
+*.swp
+*.swo
+*.orig
+*~
+
+# Archivos de bases de datos locales
+*.sqlite
+*.sqlite3
+*.db
+
+# Node.js y Composer
+node_modules/
+vendor/
+package-lock.json
+composer.lock
+
+# Directorios específicos de XAMPP
+xampp/
+xamppfiles/
+htdocs/test/
+
+# Otros
+/public/uploads/
