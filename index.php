@@ -39,6 +39,12 @@
                 <div class="alert alert-danger text-center">Usuario o contraseña incorrectos.</div>
             <?php endif; ?>
 
+            <?php if (isset($_GET['sesion']) && $_GET['sesion'] === 'expirada'): ?>
+                <div class="alert alert-warning text-center">
+                    Tu sesión ha expirado por inactividad. Por favor, vuelve a iniciar sesión.
+                </div>
+            <?php endif; ?>
+
             <form method="post" action="validar_login.php">
                 <div class="mb-3">
                     <label for="user" class="form-label">Nombre de usuario</label>

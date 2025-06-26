@@ -1,5 +1,5 @@
 <?php
-include_once 'auth.php';
+include_once 'php/sesion.php';
 include_once 'php/MovimientoController.php';
 include_once 'php/ProductoController.php';
 

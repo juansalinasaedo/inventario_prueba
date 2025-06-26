@@ -1,5 +1,5 @@
 <?php
-include_once 'auth.php';
+include_once 'php/sesion.php';
 include('php/productoController.php');
 
 $productoController = new ProductoController();
